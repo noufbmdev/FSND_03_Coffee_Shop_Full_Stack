@@ -33,6 +33,10 @@ CORS(app)
 @app.route('/drinks')
 def read_drink():
     selection = drink.query.all()
+
+    if len(selection) == 0:
+        abort(404)
+
     drinks = [drink.short() for drink in selection]
     return jsonify({
         "success": True,
@@ -53,7 +57,11 @@ def read_drink():
 
 @app.route('/drinks-detail')
 def read_drink_detail():
-    drinks = drink.query.all()
+    selection = drink.query.all()
+
+    if len(selection) == 0:
+        abort(404)
+
     drinks = [drink.long() for drink in selection]
 
     return jsonify({
