@@ -20,13 +20,8 @@ CORS(app)
 
 # ROUTES
 '''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where
-    drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+@TODO implement endpoint:
+    - returns json where 'drinks' is the list of drinks.
 '''
 
 
@@ -45,18 +40,14 @@ def read_drink():
 
 
 '''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where
-    drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+@TODO implement endpoint:
+    - returns json where 'drinks' is the list of drinks.
 '''
 
 
 @app.route('/drinks-detail')
-def read_drink_detail():
+@requires_auth('get:drinks-detail')
+def read_drink_detail(token):
     selection = drink.query.all()
 
     if len(selection) == 0:
@@ -70,21 +61,12 @@ def read_drink_detail():
     })
 
 
-'''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where
-    drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
-'''
-
-
 @app.route('/drinks', methods=['POST'])
-def create_drink():
+@requires_auth('post:drinks')
+def create_drink(token):
+    # Handles post requests for adding a new drink to the database.
     body = request.get_json()
+
     if body is None:
         abort(400)
 
@@ -100,27 +82,17 @@ def create_drink():
         abort(422)
 
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where
-    drink an array containing only the updated drink
-    or appropriate status code indicating reason for failure
-'''
-
-
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
-def update_drink(drink_id):
+@requires_auth('patch:drinks')
+def update_drink(drink_id, token):
+    # Handles patch requests for updating a drink's details.
     drink = drink.query.filter_by(id=drink_id).one_or_none()
+
     if drink is None:
         abort(404)
 
     body = request.get_json()
+
     if body is None:
         abort(400)
 
@@ -137,22 +109,12 @@ def update_drink(drink_id):
         abort(422)
 
 
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where
-    id is the id of the deleted record
-    or appropriate status code indicating reason for failure
-'''
-
-
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
-def delete_drink(drink_id):
+@requires_auth('delete:drinks')
+def delete_drink(drink_id, token):
+    # Handles delete requests for deleting a drink by ID.
     drink = drink.query.filter_by(id=drink_id).one_or_none()
+
     if drink is None:
         abort(404)
 
@@ -213,7 +175,10 @@ def unprocessable(error):
                     }), 422
 
 
-'''
-@TODO implement error handler for AuthError
-    error handler should conform to general task above
-'''
+@app.errorhandler(AuthError)
+def auth_error(error):
+    return jsonify({
+                    "success": False,
+                    "error": AuthError.status_code,
+                    "message": AuthError.error
+                    }), AuthError.status_code
