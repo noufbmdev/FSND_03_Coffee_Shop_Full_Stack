@@ -19,72 +19,58 @@ Uncomment the following line to initialize the datbase
 # db_drop_and_create_all()
 
 # ROUTES
-'''
-@TODO implement endpoint:
-    - returns json where 'drinks' is the list of drinks.
-'''
 
 
 @app.route('/drinks')
 def read_drink():
-    selection = Drink.query.all()
+    drinks = Drink.query.all()
 
-    if len(selection) == 0:
+    if len(drinks) == 0:
         abort(404)
 
-    drinks = [drink.short() for drink in selection]
     return jsonify({
         "success": True,
-        "drinks": drinks
+        "drinks": [drink.short() for drink in drinks]
     })
-
-
-'''
-@TODO implement endpoint:
-    - returns json where 'drinks' is the list of drinks.
-'''
 
 
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def read_drink_detail(token):
-    selection = Drink.query.all()
+    drinks = Drink.query.all()
 
-    if len(selection) == 0:
+    if len(drinks) == 0:
         abort(404)
-
-    drinks = [drink.long() for drink in selection]
 
     return jsonify({
         "success": True,
-        "drinks": drinks
+        "drinks": [drink.long() for drink in drinks]
     })
 
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink():
+def create_drink(token):
     # Handles post requests for adding a new drink to the database.
     body = request.get_json()
 
-    if body is None:
+    if body is None or body.get('title') is None or body.get('recipe') is None:
         abort(400)
 
-    try:
-        drink = drink(title=body.get('title'), recipe=body.get('recipe'))
-        drink.insert()
+    drink = Drink(title=body.get('title'), recipe=json.dumps(
+            body.get('recipe', None)))
 
-        return jsonify({
-            "success": True,
-            "drink": drink.long()
-        })
-    except Exception:
-        abort(422)
+    Drink.insert(drink)
+
+    return jsonify({
+        "success": True,
+        "drink": drink.long()
+    })
 
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def update_drink(drink_id, token):
+def update_drink(token, drink_id):
     # Handles patch requests for updating a drink's details.
     drink = Drink.query.filter_by(id=drink_id).one_or_none()
 
@@ -96,22 +82,22 @@ def update_drink(drink_id, token):
     if body is None:
         abort(400)
 
-    try:
+    if body.get('title', None):
         drink.title = body.get('title')
-        drink.recipe = body.get('recipe')
-        drink.update()
+    if body.get('recipe', None):
+        drink.recipe = json.dumps(body.get('recipe'))
 
-        return jsonify({
-            "success": True,
-            "drink": drink.long()
-        })
-    except Exception:
-        abort(422)
+    Drink.update(drink)
+
+    return jsonify({
+        "success": True,
+        "drink": drink.long()
+    })
 
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(drink_id, token):
+def delete_drink(token, drink_id):
     # Handles delete requests for deleting a drink by ID.
     drink = Drink.query.filter_by(id=drink_id).one_or_none()
 

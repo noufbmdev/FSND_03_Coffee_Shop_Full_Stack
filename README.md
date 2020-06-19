@@ -70,11 +70,7 @@ The `--reload` flag will detect file changes and restart the server automaticall
 ### Tasks
 
 #### Setup Auth0
-
-7. Test your endpoints with [Postman](https://getpostman.com).
-    - Sign into each account and make note of the JWT.
     - Right-clicking the postman collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
-    - Run the collection and correct any errors.
     - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
 
 ### Frontend
@@ -130,4 +126,4 @@ The authentication system used for this project is Auth0. `./src/services/auth.s
 
 #### Authorization
 
-The Auth0 JWT includes claims for permissions based on the user's role within the Auth0 system. This project makes use of these claims using the `auth.can(permission)` method which checks if particular permissions exist within the JWT permissions claim of the currently logged in user. This method is defined in  `./src/services/auth.service.ts` and is then used to enable and disable buttons in `./src/pages/drink-menu/drink-form/drink-form.html`.
+The Auth0 JWT includes claims for permissions based on the user's role within the Auth0 system. This project makes use of these claims using the `auth.can(permission)` method which checks if particular permissions exist within the JWT permissions claim of the currently logged in user. This method is defined in `./src/services/auth.service.ts` and is then used to enable and disable buttons in `./src/pages/drink-menu/drink-form/drink-form.html`.
