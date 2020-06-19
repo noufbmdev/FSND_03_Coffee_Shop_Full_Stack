@@ -67,12 +67,6 @@ flask run --reload
 
 The `--reload` flag will detect file changes and restart the server automatically.
 
-### Tasks
-
-#### Setup Auth0
-    - Right-clicking the postman collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
-    - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
-
 ### Frontend
 
 The `./frontend` directory contains a complete Ionic frontend to consume the data from the Flask server. You will only need to update the environment variables found within (./frontend/src/environment/environment.ts) to reflect the Auth0 configuration details set up for the backend app.
