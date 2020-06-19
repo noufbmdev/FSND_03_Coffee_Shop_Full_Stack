@@ -12,7 +12,7 @@ setup_db(app)
 CORS(app)
 
 '''
-@TODO uncomment the following line to initialize the datbase
+Uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
@@ -27,7 +27,7 @@ CORS(app)
 
 @app.route('/drinks')
 def read_drink():
-    selection = drink.query.all()
+    selection = Drink.query.all()
 
     if len(selection) == 0:
         abort(404)
@@ -48,7 +48,7 @@ def read_drink():
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def read_drink_detail(token):
-    selection = drink.query.all()
+    selection = Drink.query.all()
 
     if len(selection) == 0:
         abort(404)
@@ -63,7 +63,7 @@ def read_drink_detail(token):
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink(token):
+def create_drink():
     # Handles post requests for adding a new drink to the database.
     body = request.get_json()
 
@@ -86,7 +86,7 @@ def create_drink(token):
 @requires_auth('patch:drinks')
 def update_drink(drink_id, token):
     # Handles patch requests for updating a drink's details.
-    drink = drink.query.filter_by(id=drink_id).one_or_none()
+    drink = Drink.query.filter_by(id=drink_id).one_or_none()
 
     if drink is None:
         abort(404)
@@ -113,7 +113,7 @@ def update_drink(drink_id, token):
 @requires_auth('delete:drinks')
 def delete_drink(drink_id, token):
     # Handles delete requests for deleting a drink by ID.
-    drink = drink.query.filter_by(id=drink_id).one_or_none()
+    drink = Drink.query.filter_by(id=drink_id).one_or_none()
 
     if drink is None:
         abort(404)
@@ -179,6 +179,6 @@ def unprocessable(error):
 def auth_error(error):
     return jsonify({
                     "success": False,
-                    "error": AuthError.status_code,
-                    "message": AuthError.error
-                    }), AuthError.status_code
+                    "error": error.status_code,
+                    "message": error.error
+                    }), error.status_code

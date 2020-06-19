@@ -72,7 +72,6 @@ The `--reload` flag will detect file changes and restart the server automaticall
 #### Setup Auth0
 
 7. Test your endpoints with [Postman](https://getpostman.com).
-    - Register 2 users - assign the Barista role to one and Manager role to the other.
     - Sign into each account and make note of the JWT.
     - Right-clicking the postman collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
     - Run the collection and correct any errors.
