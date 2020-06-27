@@ -91,7 +91,7 @@ def update_drink(token, drink_id):
 
     return jsonify({
         "success": True,
-        "drink": drink.long()
+        "drinks": [drink.long()]
     })
 
 
